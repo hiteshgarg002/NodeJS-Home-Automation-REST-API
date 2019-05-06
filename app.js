@@ -21,69 +21,6 @@ app.use(bodyParser.json({ limit: "50mb" })); // application/json
 app.use(bodyParser.raw({ limit: '150mb' }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 })); // x-www-form-urlencoded <form>
 
-// // Setting Storage and Filename for "multer"
-// const fileStoragePhoto = multer.diskStorage({
-//     destination: (req, file, callBack) => {
-//         // null is sent as we have no errors.
-//         // "images" the destination to be used as file or picture storage.
-//         // make sure to create this folder manually otherwise it will cause errors.
-//         console.log(file.originalname);
-//         callBack(null, 'images/photo');  
-//     },
-//     filename: (req, file, callBack) => {
-//         // null is sent as we have no errors.
-//         // "images" the destination to be used as file or picture storage.
-//         // "originalname" is the original name of file.
-//         // Some character like ":" in image name might create problem so be aware of those.
-//         callBack(null, file.originalname);
-//     }
-// });
-
-// const fileStorageProfilePhoto = multer.diskStorage({
-//     destination: (req, file, callBack) => {
-//         // null is sent as we have no errors.
-//         // "images" the destination to be used as file or picture storage.
-//         // make sure to create this folder manually otherwise it will cause errors.
-//         callBack(null, 'images/profilephoto');
-//     },
-//     filename: (req, file, callBack) => {
-//         // null is sent as we have no errors.
-//         // "images" the destination to be used as file or picture storage.
-//         // "originalname" is the original name of file.
-//         // Some character like ":" in image name might create problem so be aware of those.
-//         callBack(null, file.originalname);
-//     }
-// });
-
-// // Setting Filter for multer to not to accept files other than .png or .jpg 
-// const fileFilter = (req, file, callBack) => {
-//     if (
-//         file.mimetype === "image/png" ||
-//         file.mimetype === "image/jpg" ||
-//         file.mimetype === "image/jpeg") {
-
-
-//         // null is sent as we have no errors.
-//         // true => accept the file
-//         callBack(null, true);
-//     } else {
-//         // null is sent as we have no errors.
-//         // false => reject the file.
-//         callBack(null, false);
-//     }
-// }
-
-// // Setting "multer", used to check every incoming that whether it contains (multipart data) i.e, file,
-// // if so, then it extracts the file from it.
-// // Since we expect to get only one file, we used single('field_name') method here.
-// // "dest" key is the path to save the file or picture in.
-// // "storage" key gives us more features than "dest"
-// // "fileFilter" key is used to apply a filter so that we receive only the files type we want, like here we want .png and .jpg.
-// //  app.use(multer({dest:"images"}).single('image'));
-// // app.use(multer({ storage: fileStorage }).single('image'));
-// app.use(multer({ storage: fileStoragePhoto, fileFilter: fileFilter }).single('photo'));
-// app.use(multer({ storage: fileStorageProfilePhoto, fileFilter: fileFilter }).single('profile_photo'));
-
 // Setting static path to images folder.
 // "static" method is given by "Express", and used to set static folder.
 // "/images" means every request that comes to this path(url) goes to this.
@@ -112,18 +49,6 @@ app.post('/testIO', (req, res, next) => {
     // console.log(req.body.data);
     testIO.getIO().emit('motion_detection', req.body.data);
 });
-
-
-// app.use((req, res, next) => {
-
-//     User.findById("5c8b4f16dd0e420c28ad7d58")
-//         .then(user => {
-//             // console.log("User object :- "+user);
-//             req.userId = user._id;
-//             next();
-//         })
-//         .catch((error) => console.log(error));
-// });
 
 // Registering Routes
 // appending "/auth" before every request to this route.
