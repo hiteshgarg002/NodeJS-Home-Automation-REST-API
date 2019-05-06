@@ -11,7 +11,7 @@ const User = require("./models/user");
 const testIO = require('./socket');
 
 // Connection String
-// "instagram" is the DB name
+// "homeautomation" is the DB name
 const MONGODB_URI = 'mongodb://localhost/homeautomation';
 
 const app = express();
