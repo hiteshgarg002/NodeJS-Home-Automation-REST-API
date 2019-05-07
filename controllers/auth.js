@@ -3,6 +3,9 @@ const Home = require("../models/home");
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const fs = require('fs');
+const path = require('path');
+const io=require('../socket');
 
 // Setting 'tansporter' to use 'nodemailer' with 'SendGrid' mailing server API
 const transporter = nodemailer.createTransport(sendgridTransport({
@@ -183,6 +186,114 @@ exports.postArduino = async (req, res, next) => {
 
         const updatedHome = await home.save();
         res.status(201).json({ home: updatedHome });
+
+    } catch (err) {
+        if (!err.statusCode) {
+            // "statusCode" is our own custom property and we can name it anything we want.
+            err.statusCode = 500;
+        }
+        // Since we are in async code snippet, 
+        // throwing an error won't reach to error handling 'express-middleware' that we have defined in app.js.
+        // So we have to pass it in next(error) function.
+        next(err);
+    }
+};
+
+exports.postUpdatePhoto = async (req, res, next) => {
+    const userId = req.body.userId;
+    const photoUrl = req.body.photoUrl;
+
+    try {
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            const error = new Error("User not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        user.photoUrl = photoUrl;
+
+        const updatedUser = await user.save();
+        io.getIO().sockets.in(userId).emit("reloadPhoto", updatedUser.photoUrl);
+
+        res.status(201).json({ photoUrl: updatedUser.photoUrl });
+
+    } catch (err) {
+        if (!err.statusCode) {
+            // "statusCode" is our own custom property and we can name it anything we want.
+            err.statusCode = 500;
+        }
+        // Since we are in async code snippet, 
+        // throwing an error won't reach to error handling 'express-middleware' that we have defined in app.js.
+        // So we have to pass it in next(error) function.
+        next(err);
+    }
+};
+
+exports.postUpdateName = async (req, res, next) => {
+    const userId = req.body.userId;
+    const name = req.body.name;
+
+    try {
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            const error = new Error("User not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        user.name = name;
+
+        const updatedUser = await user.save();
+        io.getIO().sockets.in(userId).emit("reloadName", updatedUser.photoUrl);
+
+        res.status(201).json({ name: updatedUser.name });
+
+    } catch (err) {
+        if (!err.statusCode) {
+            // "statusCode" is our own custom property and we can name it anything we want.
+            err.statusCode = 500;
+        }
+        // Since we are in async code snippet, 
+        // throwing an error won't reach to error handling 'express-middleware' that we have defined in app.js.
+        // So we have to pass it in next(error) function.
+        next(err);
+    }
+};
+
+exports.postDeletePhoto = async (req, res, next) => {
+    const userId = req.params.userId;
+    let photoPath = req.params.photoUrl;
+
+    try {
+        const user = await User.findById(userId);
+        user.photoUrl = "";
+
+        const updatedUser = await user.save();
+
+        io.getIO().sockets.in(userId).emit("reloadPhoto", updatedUser.photoUrl);
+
+        photoPath = photoPath.toString().replace(/:/g, "/");
+        photoPath = path.join(__dirname, "../", photoPath);
+
+        await fs.unlink(photoPath, (error) => {
+            if (error) {
+                console.log("Error :- " + error.message);
+            }
+        });
+
+        res.status(201).json({ user: updatedUser });
+
     } catch (err) {
         if (!err.statusCode) {
             // "statusCode" is our own custom property and we can name it anything we want.

@@ -1,7 +1,6 @@
 const Room = require("../models/room");
 const Home = require("../models/home");
 const User = require("../models/user");
-const io = require('../socket');
 
 exports.createRoom = async (req, res, next) => {
     const roomName = req.body.roomName;
@@ -59,6 +58,8 @@ exports.getRoom = async (req, res, next) => {
     const roomId = req.query.roomId;
 
     try {
+
+
         const room = await Room.findById(roomId);
 
         if (!room) {
@@ -167,7 +168,7 @@ exports.postAppliance = async (req, res, next) => {
 
         const updatedRoom = await room.save();
 
-        io.getIO().sockets.in(userId).emit("reloadrooms", true);
+        // io.getIO().sockets.in(userId).emit("reloadrooms", true);
 
         const home = await Home.findOne({ userId: userId });
 
@@ -256,7 +257,7 @@ exports.postDeleteAppliance = async (req, res, next) => {
         room.appliances = appliances;
         await room.save();
 
-        io.getIO().sockets.in(userId).emit("reloadroom", true);
+        // io.getIO().sockets.in(userId).emit("reloadroom", true);
 
         const home = await Home.findOne({ userId: userId });
 
@@ -295,6 +296,24 @@ exports.deleteRoom = async (req, res, next) => {
         const room = await Room.findById(roomId);
         const home = await Home.findOne({ userId: userId });
 
+        if (!room) {
+            const error = new Error("Room not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        if (!home) {
+            const error = new Error("Home not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
         const pins = [];
         const arduinoIds = [];
 
@@ -320,8 +339,42 @@ exports.deleteRoom = async (req, res, next) => {
 
         await home.save();
 
-        const deletedRoom = await Room.findByIdAndDelete(roomId);
+        await Room.findByIdAndDelete(roomId);
         res.status(201).json({ deleted: true });
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.getRoomsAppliancesCount = async (req, res, next) => {
+    const userId = req.query.userId;
+
+    try {
+        const rooms = await Room.find().where({ userId: userId });
+
+        if (!rooms) {
+            const error = new Error("Rooms not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        const numRooms = rooms.length;
+        let numAppliances = 0;
+
+        for (let i = 0; i < rooms.length; i++) {
+            numAppliances += rooms[i].appliances.length;
+        }
+
+        res.status(201).json({
+            numRooms: numRooms,
+            numAppliances: numAppliances
+        });
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500;

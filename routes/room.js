@@ -18,4 +18,6 @@ router.delete('/postDeleteAppliance/:userId/:roomId/:applianceId/:arduinoId/:pin
 
 router.delete('/postDeleteRoom/:userId/:roomId', roomController.deleteRoom);
 
+router.get('/getRoomsAppliancesCount', roomController.getRoomsAppliancesCount);
+
 module.exports = router;

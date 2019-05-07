@@ -99,7 +99,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
             socket.on("join", (data) => {
                 // console.log("User ID :- " + data);
                 socket.join(data); // using socketio rooms
-                io.sockets.in("5cc94c745ebd63081c3a08f9").emit("test", "Yo baby!");
+                // io.sockets.in("5cc94c745ebd63081c3a08f9").emit("test", "Yo baby!");
                 // io.sockets.in("5cc94c745ebd63081c3a08f9").emit("test", true);
             });
         });
