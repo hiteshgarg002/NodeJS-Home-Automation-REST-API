@@ -6,8 +6,7 @@ const multer = require('multer');
 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/room');
-
-const User = require("./models/user");
+const homeRoutes = require('./routes/home');
 const testIO = require('./socket');
 
 // Connection String
@@ -46,8 +45,8 @@ app.use((req, res, next) => {
 
 // SocketIO testing code
 app.post('/testIO', (req, res, next) => {
-    // console.log(req.body.data);
-    testIO.getIO().emit('motion_detection', req.body.data);
+    // console.log(req.body.data); 
+    testIO.getIO().sockets.in("5cc94c745ebd63081c3a08f9").emit('test', "testing data");
 });
 
 // Registering Routes
@@ -55,6 +54,7 @@ app.post('/testIO', (req, res, next) => {
 // every request starting from "/auth" will make it into this route.
 app.use('/auth', authRoutes);
 app.use('/room', roomRoutes);
+app.use('/home', homeRoutes);
 
 // Express's error handling middleware
 // Everytime either the error is thrown by 'throw' kewyord or by calling 'next(error)', 
@@ -76,7 +76,7 @@ app.use((error, req, res, next) => {
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
     .then((result) => {
         const server = app.listen(8080);
-        console.log('Connected!');
+        console.log('Connected!'); 
 
         // Setting socket.io for realtime communication like chatting app.
         // Works on WebSocket protocol instead of http protocol.
@@ -89,18 +89,30 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
         // this on() event listener will be called whenever a new connection is established.
         io.sockets.on('connection', (socket) => {
             console.log('Client Connected!');
-            // io.emit("reloadroom", true);
 
-            // // only for testing
-            // socket.on("md", (data) => {
-            //     console.log("Data aagya :- " + data);
-            // });
+            socket.on("join", (roomName) => {
 
-            socket.on("join", (data) => {
-                // console.log("User ID :- " + data);
-                socket.join(data); // using socketio rooms
+                // using socketio rooms
+                socket.join(roomName, (error) => {
+                    if (error) {
+                        console.log(`Error joining room :- ${error}`);
+                    } else {
+                        console.log(`Room has been joined by ${roomName}`);
+                    }
+                });
                 // io.sockets.in("5cc94c745ebd63081c3a08f9").emit("test", "Yo baby!");
-                // io.sockets.in("5cc94c745ebd63081c3a08f9").emit("test", true);
+            });
+
+            socket.on('dis', (roomName) => {
+                // console.log("Room name :- " + roomName);
+                socket.leave(roomName, (error) => {
+                    if (error) {
+                        console.log(`Error leaving room :- ${error}`);
+                    } else {
+                        socket.in(roomName).disconnect(true);
+                        console.log(`Room has been left by ${roomName}`);
+                    }
+                });
             });
         });
     })

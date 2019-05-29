@@ -2,6 +2,30 @@ const Room = require("../models/room");
 const Home = require("../models/home");
 const User = require("../models/user");
 
+const getCurrentDateTime = () => {
+    const today = new Date();
+    const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const dateTime = date + ' ' + time;
+
+    return dateTime;
+};
+
+const getCurrentDay = () => {
+    const date = new Date();
+    var weekday = new Array(7);
+    weekday[0] = "Sunday";
+    weekday[1] = "Monday";
+    weekday[2] = "Tuesday";
+    weekday[3] = "Wednesday";
+    weekday[4] = "Thursday";
+    weekday[5] = "Friday";
+    weekday[6] = "Saturday";
+
+    const day = weekday[date.getDay()];
+    return day;
+};
+
 exports.createRoom = async (req, res, next) => {
     const roomName = req.body.roomName;
     const userId = req.body.userId;
@@ -163,7 +187,9 @@ exports.postAppliance = async (req, res, next) => {
             arduinoId: arduinoId,
             applianceName: applianceName,
             pin: pin,
-            type: applianceType
+            type: applianceType,
+            timestamp: getCurrentDateTime(),
+            day: getCurrentDay()
         });
 
         const updatedRoom = await room.save();
@@ -374,6 +400,138 @@ exports.getRoomsAppliancesCount = async (req, res, next) => {
         res.status(201).json({
             numRooms: numRooms,
             numAppliances: numAppliances
+        });
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.putAutoModeStatus = async (req, res, next) => {
+    const automode = req.body.automode;
+
+    try {
+        const room = await Room.findOne();
+
+        if (!room) {
+            const error = new Error("Room not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        room.automode = automode;
+        const updatedRoom = await room.save();
+
+        res.status(201).json({ status: updatedRoom.automode });
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.getAutoModeStatus = async (req, res, next) => {
+    try {
+        const room = await Room.findOne();
+
+        if (!room) {
+            const error = new Error("Room not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        res.status(201).json({ status: room.automode });
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.putBulbButtonStatus = async (req, res, next) => {
+    const status = req.body.status;
+    const bulb = req.body.bulb;
+
+    console.log(bulb + "-" + status);
+
+    try {
+        const room = await Room.findOne();
+
+        if (!room) {
+            const error = new Error("Room not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        if (bulb == 1) {
+            room.bulb1 = status;
+        }
+
+        if (bulb == 2) {
+            room.bulb2 = status;
+        }
+
+        if (bulb == 3) {
+            room.bulb3 = status;
+        }
+
+        if (bulb == 4) {
+            room.bulb4 = status;
+        }
+
+        if (bulb == 5) {
+            room.bulb5 = status;
+        }
+
+        if (bulb == 6) {
+            room.bulb6 = status;
+        }
+        const updatedRoom = await room.save();
+
+        res.status(201).json({ status: status });
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+};
+
+exports.getBulbButtonStatus = async (req, res, next) => {
+    try {
+        const room = await Room.findOne();
+
+        if (!room) {
+            const error = new Error("Room not found!");
+            error.statusCode = 401;
+
+            // 'throw' will throw an error and exit this function here.
+            // this will then go to Express's 'error-handling' middleware which we have defined in app.js
+            throw error;
+        }
+
+        console.log("1" + room.bulb1 + " - " + "2" + room.bulb2);
+
+        res.status(201).json({
+            1: room.bulb1,
+            2: room.bulb2,
+            3: room.bulb3,
+            4: room.bulb4,
+            5: room.bulb5,
+            6: room.bulb6
         });
     } catch (err) {
         if (!err.statusCode) {

@@ -33,7 +33,7 @@ const userSchema = new Schema({
             ref: "Room"
         }
     ]
-});
+}, { timestamps: true });
 
 // Giving a name to collection (table) we just defined.
 module.exports = mongoose.model("User", userSchema);

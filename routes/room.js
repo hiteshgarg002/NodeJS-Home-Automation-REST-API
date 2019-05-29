@@ -20,4 +20,12 @@ router.delete('/postDeleteRoom/:userId/:roomId', roomController.deleteRoom);
 
 router.get('/getRoomsAppliancesCount', roomController.getRoomsAppliancesCount);
 
+router.get('/getAutoModeStatus', roomController.getAutoModeStatus);
+
+router.put('/putAutoModeStatus', roomController.putAutoModeStatus);
+
+router.get('/getBulbButtonStatus', roomController.getBulbButtonStatus);
+
+router.put('/putBulbButtonStatus', roomController.putBulbButtonStatus);
+
 module.exports = router;

@@ -7,10 +7,14 @@ const homeSchema = new Schema({
         //    required:true,
         ref: "User"
     },
+    address: {
+        type: String,
+        required: true
+    },
     arduino: [
         {
             arduinoId: {
-                type: String,
+                type: String
             },
             usedPins: [
                 {
@@ -19,11 +23,31 @@ const homeSchema = new Schema({
             ]
         }
     ],
-    address: {
-        type: String,
-        required: true
-    }
-});
+    motiondetection: {
+        type: Schema.Types.Boolean
+    },
+    humidity: [
+        {
+            value: { type: Schema.Types.Number },
+            day: { type: String },
+            date: { type: String }
+        }
+    ],
+    temperature: [
+        {
+            value: { type: Schema.Types.Number },
+            day: { type: String },
+            date: { type: String }
+        }
+    ],
+    lightintensity: [
+        {
+            value: { type: Schema.Types.Number },
+            day: { type: String },
+            date: { type: String }
+        }
+    ]
+}, { timestamps: true });
 
 // Giving a name to collection (table) we just defined.
 module.exports = mongoose.model("Home", homeSchema);

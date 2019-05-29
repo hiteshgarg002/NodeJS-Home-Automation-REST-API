@@ -35,24 +35,56 @@ const roomSchema = new Schema({
                 required: true
             },
             // if appliance is type of "Status" then it will have either true or false
+            // This is only for "Appliances" like bulb
             status: {
                 type: Boolean,
                 def: false,
             },
-            // if appliance is type of "Reading" then it will have values (might be in %)           
+
+            // if appliance is type of "Reading" then it will have values (might be in %) 
+            // This is only for "Sensors" like temperature sensor
             reading: {
                 type: String,
                 def: "0",
             },
-            // type is the property that defines whether it is a on/off type or reading based appliance.
+            // type is the property that defines whether it is a Applianc or Sensor.
             // types - "Status" and "Reading"
             type: {
                 type: String,
                 required: true
+            },
+            timestamp: {
+                type: Schema.Types.Date,
+                required: true
+            },
+            day: {
+                type: String,
+                required: true
             }
         }
-    ]
-});
+    ],
+    automode: {
+        type: Schema.Types.Boolean
+    },
+    bulb1: {
+        type: Schema.Types.Boolean
+    },
+    bulb2: {
+        type: Schema.Types.Boolean
+    },
+    bulb3: {
+        type: Schema.Types.Boolean
+    },
+    bulb4: {
+        type: Schema.Types.Boolean
+    },
+    bulb5: {
+        type: Schema.Types.Boolean
+    },
+    bulb6: {
+        type: Schema.Types.Boolean
+    }
+}, { timestamps: true });
 
 // Giving a name to collection (table) we just defined.
 module.exports = mongoose.model("Room", roomSchema);
