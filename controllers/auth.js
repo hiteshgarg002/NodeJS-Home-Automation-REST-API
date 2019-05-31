@@ -10,7 +10,7 @@ const io=require('../socket');
 // Setting 'tansporter' to use 'nodemailer' with 'SendGrid' mailing server API
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {
-        api_key: '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'
+        api_key: 'YOUR SENDGRID API KEY HERE'
     }
 }));
 
