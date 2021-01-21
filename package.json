@@ -20,6 +20,6 @@
     "nodemailer": "^6.1.1",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "nodemon": "^1.18.11",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.4.0"
   }
 }
